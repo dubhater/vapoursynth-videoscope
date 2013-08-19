@@ -197,6 +197,10 @@ static void drawSide(VSFrameRef *frame, int plane, int **stats, ScopeData *d, co
    int luma_stride = vsapi->getStride(frame, 0);
    int x, y, p;
 
+   int src_width = d->src_width >> d->vi.format->subSamplingW;
+   int src_height = d->src_height >> d->vi.format->subSamplingH;
+   int hist_width = d->hist_width >> d->vi.format->subSamplingW;
+
    for (y = 0; y < d->src_height; y++) {
       for (x = 0; x < d->hist_width; x++) {
          int i = stats[plane ? y >> d->vi.format->subSamplingH : y][x];
@@ -211,10 +215,6 @@ static void drawSide(VSFrameRef *frame, int plane, int **stats, ScopeData *d, co
          luma[y*luma_stride + d->src_width + x] = i;
       }
    }
-
-   int src_width = d->src_width >> d->vi.format->subSamplingW;
-   int src_height = d->src_height >> d->vi.format->subSamplingH;
-   int hist_width = d->hist_width >> d->vi.format->subSamplingW;
 
    for (p = 1; p < d->vi.format->numPlanes; p++) {
       uint8_t *chroma = vsapi->getWritePtr(frame, p);
@@ -231,6 +231,10 @@ static void drawSideUV(VSFrameRef *frame, int **stats_u, int **stats_v, ScopeDat
    uint8_t *luma = vsapi->getWritePtr(frame, 0);
    int luma_stride = vsapi->getStride(frame, 0);
    int x, y, p;
+
+   int src_width = d->src_width >> d->vi.format->subSamplingW;
+   int src_height = d->src_height >> d->vi.format->subSamplingH;
+   int hist_width = d->hist_width >> d->vi.format->subSamplingW;
 
    for (y = 0; y < d->src_height; y++) {
       int ysub = y >> d->vi.format->subSamplingH;
@@ -260,10 +264,6 @@ static void drawSideUV(VSFrameRef *frame, int **stats_u, int **stats_v, ScopeDat
       }
    }
 
-   int src_width = d->src_width >> d->vi.format->subSamplingW;
-   int src_height = d->src_height >> d->vi.format->subSamplingH;
-   int hist_width = d->hist_width >> d->vi.format->subSamplingW;
-
    for (p = 1; p < d->vi.format->numPlanes; p++) {
       uint8_t *chroma = vsapi->getWritePtr(frame, p);
       int chroma_stride = vsapi->getStride(frame, p);
@@ -279,6 +279,13 @@ static void drawSideUV(VSFrameRef *frame, int **stats_u, int **stats_v, ScopeDat
 static void drawSideYUV(VSFrameRef *frame, int **stats_y, int **stats_u, int **stats_v, ScopeData *d, const VSAPI *vsapi) {
    uint8_t *luma = vsapi->getWritePtr(frame, 0);
    int luma_stride = vsapi->getStride(frame, 0);
+   uint8_t *chroma_u = vsapi->getWritePtr(frame, 1);
+   uint8_t *chroma_v = vsapi->getWritePtr(frame, 2);
+   int chroma_stride = vsapi->getStride(frame, 1);
+
+   // FIXME: a more elegant way, maybe?
+   int moo = 1 << d->vi.format->subSamplingW;
+
    int x, y;
 
    // FIXME: this is confusing. maybe append "_sub" to the names
@@ -312,13 +319,6 @@ static void drawSideYUV(VSFrameRef *frame, int **stats_y, int **stats_u, int **s
       }
    }
 
-   uint8_t *chroma_u = vsapi->getWritePtr(frame, 1);
-   uint8_t *chroma_v = vsapi->getWritePtr(frame, 2);
-   int chroma_stride = vsapi->getStride(frame, 1);
-
-   // FIXME: a more elegant way, maybe?
-   int moo = 1 << d->vi.format->subSamplingW;
-
    for (y = 0; y < src_height; y++) {
       for (x = 0; x < hist_width/2; x++) {
          int i = stats_u[y][x*2*moo] + stats_u[y][x*2*moo + 1];
@@ -351,6 +351,10 @@ static void drawBottom(VSFrameRef *frame, int plane, int **stats, ScopeData *d, 
    int luma_stride = vsapi->getStride(frame, 0);
    int x, y, p;
 
+   int src_width = d->src_width >> d->vi.format->subSamplingW;
+   int src_height = d->src_height >> d->vi.format->subSamplingH;
+   int height = d->vi.height >> d->vi.format->subSamplingH;
+
    for (x = 0; x < d->src_width; x++) {
       for (y = 0; y < d->hist_height; y++) {
          int i = stats[plane ? x >> d->vi.format->subSamplingW : x][y];
@@ -365,10 +369,6 @@ static void drawBottom(VSFrameRef *frame, int plane, int **stats, ScopeData *d, 
          luma[(d->vi.height - 1 - y)*luma_stride + x] = i;
       }
    }
-
-   int src_width = d->src_width >> d->vi.format->subSamplingW;
-   int src_height = d->src_height >> d->vi.format->subSamplingH;
-   int height = d->vi.height >> d->vi.format->subSamplingH;
 
    for (p = 1; p < d->vi.format->numPlanes; p++) {
       uint8_t *chroma = vsapi->getWritePtr(frame, p);
@@ -385,6 +385,10 @@ static void drawBottomUV(VSFrameRef *frame, int **stats_u, int **stats_v, ScopeD
    uint8_t *luma = vsapi->getWritePtr(frame, 0);
    int luma_stride = vsapi->getStride(frame, 0);
    int x, y, p;
+
+   int src_width = d->src_width >> d->vi.format->subSamplingW;
+   int src_height = d->src_height >> d->vi.format->subSamplingH;
+   int hist_height = d->hist_height >> d->vi.format->subSamplingH;
 
    for (x = 0; x < d->src_width; x++) {
       int xsub = x >> d->vi.format->subSamplingW;
@@ -414,10 +418,6 @@ static void drawBottomUV(VSFrameRef *frame, int **stats_u, int **stats_v, ScopeD
       }
    }
 
-   int src_width = d->src_width >> d->vi.format->subSamplingW;
-   int src_height = d->src_height >> d->vi.format->subSamplingH;
-   int hist_height = d->hist_height >> d->vi.format->subSamplingH;
-
    for (p = 1; p < d->vi.format->numPlanes; p++) {
       uint8_t *chroma = vsapi->getWritePtr(frame, p);
       int chroma_stride = vsapi->getStride(frame, p);
@@ -433,6 +433,13 @@ static void drawBottomUV(VSFrameRef *frame, int **stats_u, int **stats_v, ScopeD
 static void drawBottomYUV(VSFrameRef *frame, int **stats_y, int **stats_u, int **stats_v, ScopeData *d, const VSAPI *vsapi) {
    uint8_t *luma = vsapi->getWritePtr(frame, 0);
    int luma_stride = vsapi->getStride(frame, 0);
+   uint8_t *chroma_u = vsapi->getWritePtr(frame, 1);
+   uint8_t *chroma_v = vsapi->getWritePtr(frame, 2);
+   int chroma_stride = vsapi->getStride(frame, 1);
+
+   // FIXME: a more elegant way, maybe?
+   int moo = 1 << d->vi.format->subSamplingH;
+
    int x, y;
 
    // FIXME: this is confusing. maybe append "_sub" to the names
@@ -466,13 +473,6 @@ static void drawBottomYUV(VSFrameRef *frame, int **stats_y, int **stats_u, int *
       }
    }
 
-   uint8_t *chroma_u = vsapi->getWritePtr(frame, 1);
-   uint8_t *chroma_v = vsapi->getWritePtr(frame, 2);
-   int chroma_stride = vsapi->getStride(frame, 1);
-
-   // FIXME: a more elegant way, maybe?
-   int moo = 1 << d->vi.format->subSamplingH;
-
    for (x = 0; x < src_width; x++) {
       for (y = 0; y < hist_height/2; y++) {
          int i = stats_u[x][y*2*moo] + stats_u[x][y*2*moo + 1];
@@ -505,14 +505,14 @@ static void drawCornerBlank(VSFrameRef *frame, ScopeData *d, const VSAPI *vsapi)
    int luma_stride = vsapi->getStride(frame, 0);
    int y, p;
 
-   for (y = 0; y < d->hist_height; y++) {
-      memset(luma + (d->src_height + y)*luma_stride + d->src_width, d->luma_min, d->hist_width);
-   }
-
    int src_width = d->src_width >> d->vi.format->subSamplingW;
    int src_height = d->src_height >> d->vi.format->subSamplingH;
    int hist_width = d->hist_width >> d->vi.format->subSamplingW;
    int hist_height = d->hist_height >> d->vi.format->subSamplingH;
+
+   for (y = 0; y < d->hist_height; y++) {
+      memset(luma + (d->src_height + y)*luma_stride + d->src_width, d->luma_min, d->hist_width);
+   }
 
    for (p = 1; p < d->vi.format->numPlanes; p++) {
       uint8_t *chroma = vsapi->getWritePtr(frame, p);
