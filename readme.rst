@@ -6,6 +6,20 @@ This is a rewrite of the Avisynth plugin VScope: http://forum.doom9.org/showthre
 It is similar to Avisynth's built-in Histogram() filter.
 
 
+Differences
+===========
+
+Some details are slightly different, compared to the original:
+
+- The luma in the histograms is clamped to 16-235 (as opposed to seemingly arbitrary upper limits of 255, 240, 232, depending on the function)
+
+- The chroma in the colormap is more saturated.
+
+- The tick marks are not coloured.
+
+- The full frame histograms in the corner are not coloured. I couldn't see the colours there anyway.
+
+
 Usage
 =====
 ::
