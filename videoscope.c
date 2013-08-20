@@ -637,7 +637,7 @@ static void drawCornerUV(VSFrameRef *frame, ScopeData *d, const VSAPI *vsapi) {
       for (x = 0; x < d->hist_width-1 /*why?*/; x++) {
          int i = UVmap[y*d->hist_width + x];
          if (i > 0) {
-            i = i * scale;
+            i = (int)(i * scale);
             if (i > d->luma_max) {
                i = d->luma_max;
             }
