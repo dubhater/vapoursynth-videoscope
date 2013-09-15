@@ -83,7 +83,9 @@ Compilation
 
 ::
 
-   clang -O3 -Wall -Wextra -Wno-unused-parameter -fPIC -shared -o libvideoscope.so videoscope.c
+   ./autogen.sh
+   ./configure
+   make
 
 
 License
